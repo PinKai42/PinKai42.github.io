@@ -1,0 +1,3 @@
+html{scroll-padding:0}body{margin:0;background:#eff9fe}#journey{width:100%;max-width:1600px;margin:0 auto;padding:40px}.journey-stage{margin-top:0}.flow-try{height:0;overflow:hidden;margin:0}.flow-try.show-guidance{height:auto;overflow:visible;margin-top:16px}@media(max-width:700px){#journey{padding:20px}}html,body,main,#journey { background:transparent !important; background-image:none !important; min-height:0 !important; }
+body::before,body::after { display:none !important; }
+#journey { padding:0; margin:0 auto; }
