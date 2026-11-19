@@ -164,11 +164,11 @@ if(new URLSearchParams(location.search).has('journey')){
  window.addEventListener('message',e=>{
    if(e.origin!==location.origin||e.source!==parent||e.data?.type!=='journey-command')return;
    const stage=e.data.stage;commandTarget=stage;previousStage=stage;
-   if(stage==='input'){reset();return;}
+   if(stage==='input'){reset();if(e.data.prompt){input.value=e.data.prompt;syncComposer();}return;}
    if(stage==='completed'&&state==='completed')return;
    if(stage==='completed')window.journeySpeed=100;
    else window.journeySpeed=1;
-   if(state==='idle'||state==='completed'){if(state==='completed')reset();input.value=defaultPrompt;syncComposer();document.querySelector('#form').requestSubmit();}
+   if(state==='idle'||state==='completed'){if(state==='completed')reset();input.value=e.data.prompt||defaultPrompt;syncComposer();document.querySelector('#form').requestSubmit();}
    else if(paused)resumeGeneration();
  });
  chat.addEventListener('click',e=>{
@@ -195,3 +195,11 @@ chat.addEventListener('click',e=>{
 
 /* The hand-held mockup has a deeper camera capsule than the flat demo shell. */
 try{if(parent!==window&&parent.document.documentElement.classList.contains('device-only'))document.documentElement.classList.add('hand-status-aligned');}catch(e){}
+
+// Drag the recommendation gallery without triggering the image viewer.
+let galleryDrag=null,gallerySuppress=false;
+chat.addEventListener('pointerdown',e=>{const gallery=e.target.closest('.photos');if(!gallery||e.pointerType==='touch')return;galleryDrag={gallery,x:e.clientX,left:gallery.scrollLeft,moved:false};gallerySuppress=false;});
+window.addEventListener('pointermove',e=>{if(!galleryDrag)return;const d=galleryDrag,delta=e.clientX-d.x;if(Math.abs(delta)>5){d.moved=true;gallerySuppress=true;d.gallery.classList.add('dragging');}if(d.moved){d.gallery.scrollLeft=d.left-delta;e.preventDefault();}});
+window.addEventListener('pointerup',()=>{if(galleryDrag)galleryDrag.gallery.classList.remove('dragging');galleryDrag=null;setTimeout(()=>gallerySuppress=false,0);});
+chat.addEventListener('click',e=>{if(gallerySuppress&&e.target.closest('.photos')){e.preventDefault();e.stopImmediatePropagation();}},true);
+chat.addEventListener('dragstart',e=>{if(e.target.closest('.photos'))e.preventDefault();});

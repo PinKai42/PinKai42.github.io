@@ -371,3 +371,7 @@ html.reduce-motion{scroll-behavior:auto}
 .decision-copy .flow-decision-list li{background:transparent;border:0;border-top:1px solid var(--line);padding:20px 0}
 .decision-copy .flow-decision-list p{font-size:14px;margin:0;line-height:1.85}
 @media(max-width:800px){.decision-analysis{grid-template-columns:1fr;gap:28px}.decision-screen{max-width:280px;margin:0 auto}.decision-copy h3{font-size:22px}}
+
+/* Keep demonstration hit areas invisible in every interaction state. */
+.phone .hotspot,.phone .hotspot:hover,.phone.show-guidance .hotspot,.phone .back-hotspot,.phone.show-guidance .back-hotspot,.phone .map-collapse{background:transparent!important;box-shadow:none!important;outline:none!important;animation:none!important}
+.phone .hs-label{display:none!important}

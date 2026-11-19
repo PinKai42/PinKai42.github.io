@@ -1,0 +1,19 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="390" height="844" viewBox="0 0 390 844" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Mask group">
+<mask id="mask0_0_46" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="390" height="844">
+<path id="Rectangle 166" d="M0 0H390V844H0V0Z" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask0_0_46)">
+<g id="Ellipse 57" filter="url(#filter0_f_0_46)">
+<path d="M437 27.1914C437 111.662 387.626 57.1302 315 57.1302C242.375 57.1302 126.5 83.0252 126.5 -1.44563C126.5 -85.9164 232.875 -125.757 305.5 -125.757C378.126 -125.757 437 -57.2794 437 27.1914Z" fill="#FFCECE" fill-opacity="0.4"/>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_f_0_46" x="7.60011" y="-244.657" width="548.3" height="438.005" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="59.45" result="effect1_foregroundBlur_0_46"/>
+</filter>
+</defs>
+</svg>

@@ -350,6 +350,8 @@
   });
 
 
+  var selectedDay = 12;
+  var formPrompt = null;
   var journeyLiveFrame = null, journeyLiveReady = false, journeyLiveChain = -1;
   var liveScreens = ['chat-idle','chat-thinking-top','chat-thinking','chat-done'];
   function liveStage(screen) { return screen === 'chat-done' ? 'completed' : screen === 'chat-thinking' ? 'thinking' : screen === 'chat-thinking-top' ? 'sent' : 'input'; }
@@ -365,11 +367,11 @@
       journeyLiveFrame.className='journey-live-frame';
       journeyLiveFrame.title='小骆旅行助手连续交互流程';
       journeyLiveFrame.src='travel-flow/index.html?journey=1';
-      journeyLiveFrame.addEventListener('load',function(){journeyLiveReady=true;journeyLiveFrame.contentWindow.postMessage({type:'journey-command',stage:liveStage(CHAINS[chain].steps[step].screen)},location.origin);});
+      journeyLiveFrame.addEventListener('load',function(){journeyLiveReady=true;journeyLiveFrame.contentWindow.postMessage({type:'journey-command',prompt:formPrompt,stage:liveStage(CHAINS[chain].steps[step].screen)},location.origin);});
     }
     if(journeyLiveFrame.parentElement!==screenEl) screenEl.replaceChildren(journeyLiveFrame);
     updateLiveSize();
-    if(journeyLiveReady) journeyLiveFrame.contentWindow.postMessage({type:'journey-command',stage:liveStage(screen)},location.origin);
+    if(journeyLiveReady) journeyLiveFrame.contentWindow.postMessage({type:'journey-command',prompt:formPrompt,stage:liveStage(screen)},location.origin);
     journeyLiveChain=chain;
   }
   window.addEventListener('message',function(e){
@@ -397,24 +399,23 @@
     if(journeyLiveFrame){journeyLiveFrame.remove();journeyLiveFrame=null;journeyLiveReady=false;}
     var def = SCREENS[s.screen];
     if (!def) { screenEl.innerHTML = ''; return; }
-    var hs = def.hs.map(function (h) {
-      var cls = 'hotspot' + (h.go === null ? ' hs-info' : '') + (h.below ? ' below' : '');
-      var go = h.go ? ' data-go="' + h.go + '"' : '';
-      return '<button class="' + cls + '"' + go + ' style="left:' + h.x + '%;top:' + h.y + '%;width:' + h.w + '%;height:' + h.h + '%" aria-label="' + h.label + '"><span class="hs-label">' + h.label + '</span></button>';
-    }).join('');
-    /* App 内返回箭头热区：对齐原截图位置；起始步骤 / 无返回入口的界面不提供 */
-    var backBtn = '';
-    if (def.back && (step > 0 || history.length)) {
-      var b = def.back;
-      backBtn = '<button class="back-hotspot" data-back="1" aria-label="返回上一级界面" style="left:' + b.x + '%;top:' + b.y + '%;width:' + b.w + '%;height:' + b.h + '%"></button>';
-    }
-    screenEl.dataset.off = def.off;
-    screenEl.innerHTML =
-      '<div class="jimg-wrap jimg-in">' +
-        '<img src="assets/' + def.img + '" alt="' + s.title + '" draggable="false">' + backBtn + hs +
-      '</div>';
-    setupPhoneScroll(screenEl, { hint: screenHint(def) });
+    screenEl.dataset.off=0;
+    screenEl.classList.add('journey-live-screen');
+    screenEl.closest('.phone').classList.add('has-live-journey');
+    var frame=document.createElement('iframe');
+    frame.className='journey-live-frame';frame.title=s.title+' · Figma图层重绘';frame.src='native/index.html';
+    frame.style.transform='scale('+(screenEl.clientWidth/390)+')';
+    frame.dataset.native='1';screenEl.replaceChildren(frame);
+    frame.addEventListener('load',function(){frame.contentWindow.postMessage({type:'native-screen',screen:s.screen,day:selectedDay,hotspots:def.hs,back:def.back},location.origin);});
   }
+  window.addEventListener('message',function(e){
+    var frame=screenEl.querySelector('iframe[data-native]');
+    if(e.origin!==location.origin||!frame||e.source!==frame.contentWindow||e.data?.type!=='native-action')return;
+    if(e.data.fields){var f=e.data.fields;formPrompt='我想去'+f[1]+'旅行，从'+f[0]+'出发。'+f[3]+'，预计游玩'+f[2]+'。请帮我设计出行的详细行程。';}
+    if(e.data.day)selectedDay=e.data.day;
+    var target=e.data.target;if(target==='main:4'&&CHAINS[chain].steps[step].screen==='day-list'){renderScreen();return;}if(target==='back')goBack();else if(target)gotoTarget(target);else flash('路线已优化，按就近顺序安排游览');
+  });
+  new ResizeObserver(function(){var f=screenEl.querySelector('iframe[data-native]');if(f)f.style.transform='scale('+(screenEl.clientWidth/390)+')';}).observe(screenEl);
 
   function renderDetail() {
     var c = CHAINS[chain], s = c.steps[step];
@@ -530,7 +531,8 @@
       var opener=document.activeElement,view=document.createElement('div');
       view.className='map-expanded-view';
       view.setAttribute('role','region');view.setAttribute('aria-label','放大地图');
-      view.innerHTML='<img src="assets/map-expanded.png" alt="北京四日游全屏地图"><button class="map-collapse" aria-label="返回行程总览"></button>';
+      view.innerHTML='<iframe title="北京四日游地图" class="journey-live-frame" src="native/index.html"></iframe><button class="map-collapse" aria-label="返回行程总览"></button>';
+      var mapFrame=view.querySelector('iframe');mapFrame.style.transform='scale('+(screenEl.clientWidth/390)+')';mapFrame.onload=function(){mapFrame.contentWindow.postMessage({type:'native-screen',screen:'map',hotspots:[],back:null},location.origin);};
       var close=function(){view.remove();opener?.focus({preventScroll:true});};
       view.querySelector('button').onclick=close;
       view.addEventListener('keydown',function(e){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}});

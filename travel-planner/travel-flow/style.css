@@ -61,3 +61,5 @@ html,body{width:390px;height:844px;margin:0;overflow:hidden;background:#c5e4fb}
 .hand-status-aligned #scroll>header>b,.hand-status-aligned #scroll>header>img{transform:translateY(12px)}
 
 .photo-card:has(img.second-photo){width:264px}.photo-card img.second-photo{width:264px;height:264px;transform:none;object-fit:cover}
+
+.photos{touch-action:pan-x;overscroll-behavior-x:contain;scroll-snap-type:x proximity;cursor:grab;user-select:none}.photos .photo-card{scroll-snap-align:start;flex-shrink:0}.photos .photo-card:last-child{scroll-snap-align:end}.photos.dragging{cursor:grabbing;scroll-snap-type:none}
